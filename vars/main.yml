@@ -78,6 +78,7 @@ postfix_default_local_aliases:
   'kmem': ['root']
   'toor': ['root']
   'tty': ['root']
+  'monit': ['root']
 
   # Popular aliases
   'manager': ['root']
