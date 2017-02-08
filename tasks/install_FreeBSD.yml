@@ -1,0 +1,37 @@
+---
+
+- name: Install Postfix base packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - postfix
+    - gmake
+  when: "ansible_os_family == 'FreeBSD'"
+
+- name: Ensure Administrative etc/mail path exists
+  file:
+    path: "/usr/local/etc/mail"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: Install Postfix mailer.conf for mailwrapper
+  copy:
+    src: "{{ ansible_os_family }}-mailer.conf"
+    dest: "/usr/local/etc/mail/mailer.conf"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: Ensure Periodic settings are appropriate for Postfix
+  lineinfile:
+    dest: "/etc/defaults/periodic.conf"
+    regexp: "^{{ item }}="
+    line: "{{ item }}=\"NO\""
+  with_items:
+    - "daily_clean_hoststat_enable"
+    - "daily_status_mail_rejects_enable"
+    - "daily_status_include_submit_mailq"
+    - "daily_submit_queuerun"

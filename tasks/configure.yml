@@ -10,7 +10,7 @@
     src: 'etc/aliases.j2'
     dest: '/etc/aliases'
     owner: 'root'
-    group: 'root'
+    group: '{{ postfix_group }}'
     mode: '0644'
   notify: [ 'Generate mail alias database' ]
 
@@ -19,42 +19,42 @@
     src: '{{ item }}.j2'
     dest: '/{{ item }}'
     owner: 'root'
-    group: 'root'
+    group: '{{ postfix_group }}'
     mode: '0644'
   with_items: [ 'etc/mailname' ]
 
 - name: Create Postfix configuration directories
   file:
-    path: '/etc/postfix/{{ item }}'
+    path: '{{ postfix_etc }}/{{ item }}'
     state: 'directory'
     owner: 'root'
-    group: 'root'
+    group: '{{ postfix_group }}'
     mode: '0755'
   with_items: [ 'tables', 'hash_aliases', 'hash_tables' ]
 
 - name: Create Postfix private configuration directories
   file:
-    path: '/etc/postfix/{{ item }}'
+    path: '{{ postfix_etc }}/{{ item }}'
     state: 'directory'
     owner: 'root'
-    group: 'root'
+    group: '{{ postfix_group }}'
     mode: '0700'
   with_items: [ 'private_hash_tables' ]
 
 - name: Generate Postfix Makefile
   template:
     src: 'etc/postfix/Makefile.j2'
-    dest: '/etc/postfix/Makefile'
+    dest: '{{ postfix_etc }}/Makefile'
     owner: 'root'
-    group: 'root'
+    group: '{{ postfix_group }}'
     mode: '0644'
 
 - name: Generate Postfix configuration
   template:
     src: 'etc/postfix/{{ item }}/ansible.j2'
-    dest: '/etc/postfix/{{ item }}'
+    dest: '{{ postfix_etc }}/{{ item }}'
     owner: 'root'
-    group: 'root'
+    group: '{{ postfix_group }}'
     mode: '0644'
   with_items: [ 'main.cf', 'master.cf' ]
   notify: [ 'Check postfix and restart' ]
@@ -62,9 +62,9 @@
 - name: Generate Postfix tables sources
   template:
     src: '{{ item }}'
-    dest: '/etc/postfix/tables/{{ item | basename | replace(".j2", "") }}'
+    dest: '{{ postfix_etc }}/tables/{{ item | basename | replace(".j2", "") }}'
     owner: 'root'
-    group: 'root'
+    group: '{{ postfix_group }}'
     mode: '0644'
   with_fileglob: [ '../templates/etc/postfix/tables/*.j2' ]
 
@@ -80,9 +80,9 @@
 - name: Generate Postfix hash tables sources
   template:
     src: '{{ item }}'
-    dest: '/etc/postfix/hash_tables/{{ item | basename | replace(".j2", ".in") }}'
+    dest: '{{ postfix_etc }}/hash_tables/{{ item | basename | replace(".j2", ".in") }}'
     owner: 'root'
-    group: 'root'
+    group: '{{ postfix_group }}'
     mode: '0644'
   with_fileglob: [ '../templates/etc/postfix/hash_tables/*.j2' ]
 
@@ -93,16 +93,16 @@
   register: postfix_register_local_private_hash_tables
 
 - name: Check what private hash tables are locked
-  shell: find /etc/postfix/private_hash_tables -maxdepth 1 -type f -name '*.lock' -exec basename {} .lock \;
+  shell: find {{ postfix_etc }}/private_hash_tables -maxdepth 1 -type f -name '*.lock' -exec basename {} .lock \;
   register: postfix_register_remote_private_hash_tables
   changed_when: False
 
 - name: Generate unlocked Postfix private hash tables
   template:
     src: 'etc/postfix/private_hash_tables/{{ item.item | basename }}'
-    dest: '/etc/postfix/private_hash_tables/{{ item.item | basename | replace(".j2", ".in") }}'
+    dest: '{{ postfix_etc }}/private_hash_tables/{{ item.item | basename | replace(".j2", ".in") }}'
     owner: 'root'
-    group: 'root'
+    group: '{{ postfix_group }}'
     mode: '0600'
   with_items: '{{ postfix_register_local_private_hash_tables.results }}'
   when: item.item | basename | replace('.j2', '') not in postfix_register_remote_private_hash_tables.stdout_lines
@@ -110,18 +110,18 @@
 - name: Run tasks from Postfix Makefile
   environment:
     LC_ALL: 'C'
-  command: make
+  command: "{{ postfix_make }}"
   args:
-    chdir: '/etc/postfix'
+    chdir: '{{ postfix_etc }}'
   register: postfix_register_make
-  changed_when: "not postfix_register_make.stdout.startswith('make: Nothing to be done')"
+  changed_when: "'make: Nothing to be done' not in postfix_register_make.stdout"
 
 - name: Restart Postfix if capabilities change
   template:
     src: 'etc/postfix/postfix-capabilities.j2'
-    dest: '/etc/postfix/postfix-capabilities'
+    dest: '{{ postfix_etc }}/postfix-capabilities'
     owner: 'root'
-    group: 'root'
+    group: '{{ postfix_group }}'
     mode: '0644'
   notify: [ 'Check postfix and restart' ]
 

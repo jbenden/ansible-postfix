@@ -1,14 +1,16 @@
 ---
 
 - name: Run postfix Makefile
-  command: make chdir=/etc/postfix
+  command: "{{ postfix_make }}"
+  args:
+    chdir: "{{ postfix_etc }}"
   notify: [ 'Check postfix and restart' ]
 
 - name: Generate mail alias database
-  command: newaliases
+  command: "{{ postfix_newaliases }}"
 
 - name: Check postfix and restart
-  command: /usr/sbin/postfix -c /etc/postfix check
+  command: "{{ postfix_binary }} -c {{ postfix_etc }} check"
   notify: [ 'Restart postfix' ]
 
 - name: Restart postfix

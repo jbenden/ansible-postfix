@@ -1,0 +1,21 @@
+---
+
+- name: Ensure Postfix is enabled and running
+  service:
+    name: "postfix"
+    state: started
+    enabled: yes
+  when: postfix
+
+- name: Ensure Postfix is disabled and not running
+  service:
+    name: "postfix"
+    state: stopped
+    enabled: no
+  when: not postfix
+
+- name: Uninstall Postfix mailer.conf for mailwrapper
+  file:
+    path: "/usr/local/etc/mail/mailer.conf"
+    state: absent
+  when: not postfix

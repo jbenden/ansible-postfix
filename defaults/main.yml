@@ -31,6 +31,12 @@ postfix: [ 'null' ]
 postfix_capabilities: '{{ postfix | d([], true) }}'
 
 
+# .. envvar:: postfix_debops_hooks
+#
+# Whether to execute the pre- and post- task hooks.
+postfix_debops_hooks: true
+
+
 # .. envvar:: postfix_packages
 #
 # List of additional Postfix packages.

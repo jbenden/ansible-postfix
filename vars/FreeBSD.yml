@@ -1,0 +1,8 @@
+---
+
+postfix_etc: "/usr/local/etc/postfix"
+postfix_binary: "/usr/local/sbin/postfix"
+postfix_newaliases: "/usr/bin/newaliases"
+postfix_make: "/usr/local/bin/gmake"
+postfix_factsd: "/usr/local/etc/ansible/facts.d"
+postfix_group: "wheel"

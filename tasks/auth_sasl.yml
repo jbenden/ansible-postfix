@@ -15,6 +15,7 @@
     append: True
     createhome: False
   notify: [ 'Check postfix and restart' ]
+  when: postfix_smtpd_sasl_type == 'cyrus'
 
 - name: Configure Cyrus SASL Authentication
   template:

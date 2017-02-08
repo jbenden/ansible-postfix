@@ -1,22 +1,26 @@
 ---
 
+- name: add the OS specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
 - name: DebOps pre_tasks hook
   include: "{{ lookup('task_src', 'postfix/pre_main.yml') }}"
+  when: postfix_debops_hooks
 
 - name: Make sure Ansible local facts directory exists
   file:
-    dest: '/etc/ansible/facts.d'
+    dest: '{{ postfix_factsd }}'
     state: 'directory'
     owner: 'root'
-    group: 'root'
+    group: '{{ postfix_group }}'
     mode: '0755'
 
 - name: Configure Postfix local facts
   template:
     src: 'etc/ansible/facts.d/postfix.fact.j2'
-    dest: '/etc/ansible/facts.d/postfix.fact'
+    dest: '{{ postfix_factsd }}/postfix.fact'
     owner: 'root'
-    group: 'root'
+    group: '{{ postfix_group }}'
     mode: '0644'
   register: postfix_register_local_facts
 
@@ -25,7 +29,10 @@
   when: postfix_register_local_facts.changed
 
 - include: install_divert.yml
-  when: postfix
+  when: "postfix and ansible_os_family == 'Debian'"
+
+- include: install_FreeBSD.yml
+  when: ansible_os_family == 'FreeBSD'
 
 - include: configure.yml
   when: postfix
@@ -41,8 +48,12 @@
           and postfix_smtpd_sasl_type != 'dovecot')))
 
 - include: disable_revert.yml
-  when: not postfix
+  when: "not postfix and ansible_os_family == 'Debian'"
+
+- include: extra_FreeBSD.yml
+  when: ansible_os_family == 'FreeBSD'
 
 - name: DebOps post_tasks hook
   include: "{{ lookup('task_src', 'postfix/post_main.yml') }}"
+  when: postfix_debops_hooks
 

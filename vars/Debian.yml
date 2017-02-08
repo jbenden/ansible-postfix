@@ -1,0 +1,8 @@
+---
+
+postfix_etc: "/etc/postfix"
+postfix_binary: "/usr/sbin/postfix"
+postfix_newaliases: "newaliases"
+postfix_make: "make"
+postfix_factsd: "/etc/ansible/facts.d"
+postfix_group: "root"
