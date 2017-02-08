@@ -2,7 +2,7 @@
 
 # Local alias database
 
-{% if 'local' in postfix %}
+{% if 'local' in postfix or (postfix_want_local is defined and postfix_want_local) %}
 {%     if postfix_local_aliases is defined and postfix_local_aliases %}
 {%         for alias, list in postfix_local_aliases.iteritems() %}
 {%             if list %}

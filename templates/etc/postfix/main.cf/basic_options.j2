@@ -14,8 +14,10 @@ myorigin                        = $mydomain
 {%     else %}
 myorigin                        = $myhostname
 {%     endif %}
+{%     if postfix_want_local is undefined or (postfix_want_local is defined and not postfix_want_local) %}
 local_recipient_maps            =
 local_transport                 = error:local mail delivery is disabled
+{%     endif %}
 
 {% endif %}
 myhostname                      = {{ postfix_myhostname | default(ansible_fqdn) }}
