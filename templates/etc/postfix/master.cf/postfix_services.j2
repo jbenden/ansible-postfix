@@ -18,7 +18,7 @@ showq     unix  n       -       -       -       -       showq
 error     unix  -       -       -       -       -       error
 retry     unix  -       -       -       -       -       error
 discard   unix  -       -       -       -       -       discard
-{% if 'local' in postfix %}
+{% if 'local' in postfix or (postfix_want_local is defined and postfix_want_local) %}
 local     unix  -       n       n       -       -       local
 {% else %}
 #local requires: +local

@@ -1,0 +1,22 @@
+# This file is managed by Ansible, all changes will be lost
+
+# Virtual maps for MX deliveries
+
+{% if 'mx' in postfix %}
+{%     if postfix_virtual_accounts is defined and postfix_virtual_accounts %}
+{%         for entry in postfix_virtual_accounts %}
+{{ "%-24s" | format(entry.to) }} {{ ", ".join(entry.destination) }}
+{%         endfor %}
+{%     else %}
+# postfix_virtual_accounts not defined (Ansible)
+{%     endif %}
+{% else %}
+# required postfix capability: +mx
+{% endif %}
+{% if 'test' in postfix %}
+
+# ---- Debug information ----
+# postfix capabilities: {{ ",".join(postfix) }}
+# postfix_relay_domains = {{ ", ".join(postfix_relay_domains) }}
+# postfix_relayhost = {{ postfix_relayhost }}
+{% endif %}
