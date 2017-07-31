@@ -5,6 +5,7 @@ biff                            = no
 append_dot_mydomain             = no
 delay_warning_time              = {{ postfix_delay_warning_time | default('4h') }}
 enable_long_queue_ids           = {{ postfix_long_queue_ids | default('yes') }}
+compatibility_level             = 2
 
 {% if 'local' in postfix %}
 myorigin                        = {{ postfix_mailname | default(ansible_fqdn) }}
