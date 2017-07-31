@@ -17,5 +17,7 @@
   'uucp',
   'local_mastercf' ] %}
 {% for part in postfix_tpl_mastercf_parts %}
-{% include part + '.j2' %}
+{% include part + '.j2' %} {# tactical
+comments #}
+
 {% endfor %}

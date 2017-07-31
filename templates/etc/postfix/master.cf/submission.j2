@@ -1,4 +1,4 @@
-{% if 'submission' in postfix %}
+{%- if 'submission' in postfix %}
 submission inet n       -       -       -       -       smtpd
   -o syslog_name=postfix/submission
   -o smtpd_tls_security_level=encrypt
@@ -13,6 +13,6 @@ submission inet n       -       -       -       -       smtpd
   -o receive_override_options=no_header_body_checks,no_address_mappings
   -o smtpd_sender_restrictions=permit_sasl_authenticated,reject
   -o smtpd_recipient_restrictions=reject_non_fqdn_recipient,reject_unknown_recipient_domain,permit_sasl_authenticated,reject
-{% else %}
+{%- else %}
 #submission requires: +submission
 {% endif %}
